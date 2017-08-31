@@ -32,10 +32,10 @@ abstract class Entity extends CActiveRecord
     {
         if (parent::beforeSave()) {
             if ($this->isNewRecord) {
-                $this->id_user_create = isset(Yii::app()->user) ? Yii::app()->user->id : null;
+                $this->id_user_create  = isset(Yii::app()->user) ? Yii::app()->user->id : null;
                 $this->datetime_create = date("Y-m-d H:i:s");
             } else {
-                $this->id_user_update = isset(Yii::app()->user) ? Yii::app()->user->id : null;
+                $this->id_user_update  = isset(Yii::app()->user) ? Yii::app()->user->id : null;
                 $this->datetime_update = date("Y-m-d H:i:s");
             }
             return true;
@@ -76,5 +76,4 @@ abstract class Entity extends CActiveRecord
             }
         }
     }
-
 }
