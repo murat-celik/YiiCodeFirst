@@ -5,6 +5,7 @@ class EntityManagerComponent extends CApplicationComponent
 
     private $_files;
     private $_modules;
+    private $_declared_classes;
 
     private function setModulesFilesAutoload()
     {
@@ -47,11 +48,30 @@ class EntityManagerComponent extends CApplicationComponent
         $this->setModulesFilesAutoload();
     }
 
+    public function setDeclaredClasses(){
+        $this->_declared_classes = get_declared_classes();
+    }
+    
+    private function createRetations(){
+
+        foreach ($this->_declared_classe as $class) {
+            if (is_subclass_of($class, 'Entity')) {
+                $model = new $class(null);
+                if ($model->createTable()) {
+                    $model->createRelations();
+                }
+            }
+            unset($model);
+            unset($entity);
+        }
+    }
+
     public function updateDatabase()
     {
         $this->setFilesAutoload();
+        $this->setDeclaredClasses();
 
-        foreach (get_declared_classes() as $class) {
+        foreach ($this->_declared_classes as $class) {
 
             if (is_subclass_of($class, 'Entity')) {
                 $entity = new ReflectionClass($class);
@@ -63,7 +83,7 @@ class EntityManagerComponent extends CApplicationComponent
 
                     foreach ($entity->getProperties() as $item) {
 
-                        if (in_array($item->name, $tableColumns) == false) {
+                        if ($item->name != 'db' && in_array($item->name, $tableColumns) == false) {
 
                             $columnQuery = "ALTER TABLE " . $model->tableName() . " ADD " . $item->name;
                             $itemAttributes = array_filter(explode(',', str_replace('/', '', str_replace('*', '', $item->getDocComment()))));
@@ -107,11 +127,12 @@ class EntityManagerComponent extends CApplicationComponent
                         Yii::app()->db->createCommand(implode(';', $tableColumnsQuery))->execute();
                     }
 
-                    $model->createRelations();
                 }
             }
             unset($model);
             unset($entity);
         }
+
+        $this->createRetations();
     }
 }
