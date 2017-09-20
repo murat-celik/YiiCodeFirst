@@ -54,7 +54,7 @@ class EntityManagerComponent extends CApplicationComponent
     
     private function createRetations(){
 
-        foreach ($this->_declared_classe as $class) {
+        foreach ($this->_declared_classes as $class) {
             if (is_subclass_of($class, 'Entity')) {
                 $model = new $class(null);
                 if ($model->createTable()) {
